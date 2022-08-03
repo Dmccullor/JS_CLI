@@ -6,11 +6,17 @@ export function Account (id, name, pin, balance, transactions) {
     this.transactions = [transactions];
 }
 
+function convertDatetime(stamp) {
+    const dateObject = new Date(stamp);
+    const readableDate = dateObject.toLocaleString();
+    return readableDate;
+}
+
 export function makeTransaction (type, amount) {
     let transaction = {
         "Type": type,
         "Amount": amount,
-        "Date": Date.now()
+        "Date": convertDatetime(Date.now())
     }
 
     return transaction;
