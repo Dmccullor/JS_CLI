@@ -12,7 +12,7 @@ import {Account, makeTransaction} from './src/model.js';
 // HELPER FUNCTIONS
 const sleep = (ms = 2000) => new Promise ((r) => setTimeout(r, ms));
 
-function displayAccounts() {
+async function displayAccounts() {
   return console.log(accountLedger);
 }
 
@@ -76,7 +76,7 @@ async function createAccount() {
         }
       },
       {
-        type: 'input',
+        type: 'number',
         name: 'deposit',
         message: 'New accounts require a deposit of at least $500. How much would you like to deposit?',
         validate: (answer) => {
@@ -95,7 +95,7 @@ async function createAccount() {
     .then(answers => {
       let name = answers.name;
       let pin = answers.pin;
-      let deposit = Number(answers.deposit);
+      let deposit = answers.deposit;
       let transaction = makeTransaction('deposit', deposit);
       let customer = new Account(idCounter, name, pin, deposit, transaction);
       accountLedger.push(customer);
@@ -106,7 +106,6 @@ async function createAccount() {
       console.log(chalk.magenta('Save your ID and PIN!\n'));
       
       makeDeposit();
-      // displayAccounts();
     })
 }
 
@@ -116,7 +115,7 @@ async function makeDeposit() {
   inquirer
     .prompt([
       {
-        type: 'input',
+        type: 'number',
         name: 'amount',
         message: 'How much do you want to deposit?',
         validate: (answer) => {
@@ -138,18 +137,130 @@ async function makeDeposit() {
       }
     ])
     .then(answers => {
-      let amount = Number(answers.amount);
+      // let amount = Number(answers.amount);
+      let amount = answers.amount;
 
       if(answers.confirmation) {
-        account.balance = Number(account.balance) + Number(amount);
+        account.balance = account.balance + amount;
         let transaction = makeTransaction('deposit', amount);
         account.transactions.push(transaction);
-        displayAccounts();
-        console.log(principal);
+        console.log(`\n${chalk.cyan('Deposit Success!')} Your new account balance is ${chalk.green('$' + account.balance)}\n`);
       }
       else {
         // mainMenu();
       }
+      makeWithdrawal();
+    })
+}
+
+async function makeWithdrawal() {
+  let account = getAccountById(principal.id);
+
+  inquirer
+    .prompt([
+      {
+        type: 'number',
+        name: 'amount',
+        message: 'How much do you want to withdraw?',
+        validate: (answer) => {
+          if(isNaN(answer)) {
+            return chalk.red('Amount must be a number');
+          }
+          else if (answer <= 0) {
+            return chalk.red('Amount must be greater than 0');
+          }
+          else if (answer > account.balance) {
+            return chalk.red('Amount cannot be more than you have in your account!');
+          }
+          else {
+            return true;
+          }
+        }
+      },
+      {
+        type: 'confirm',
+        name: 'confirmation',
+        message: 'Are you sure you want to withdraw?'
+      }
+    ])
+    .then(answers => {
+      let amount = answers.amount;
+
+      if(answers.confirmation) {
+        account.balance = account.balance - amount;
+        let transaction = makeTransaction('withdrawal', amount);
+        account.transactions.push(transaction);
+        console.log(`\n${chalk.cyan('Withdrawal Success!')} Your new account balance is ${chalk.green('$' + account.balance)}\n`);
+      }
+      else {
+        // mainMenu();
+      }
+      viewTransactions();
+    })
+}
+
+async function viewTransactions() {
+  let account = getAccountById(principal.id);
+  let transactionList = account.transactions;
+
+  console.log(chalk.bgCyan('\nTransaction Log:'));
+  console.log(chalk.cyan('--------------------'));
+  console.log(transactionList);
+  viewBalance();
+}
+
+async function viewBalance() {
+  let account = getAccountById(principal.id);
+  let accountBalance = account.balance;
+
+  console.log(chalk.bgCyan('\nAccount Balance:'));
+  console.log(chalk.cyan('--------------------'));
+  console.log(chalk.green(`$${accountBalance}\n`));
+
+  updatePin();
+}
+
+async function updatePin() {
+  let account = getAccountById(principal.id);
+  
+  inquirer
+    .prompt([
+      {
+        type: 'password',
+        name: 'newPin',
+        message: 'Please enter your new PIN #:',
+        mask: '*',
+        validate: (answer) => {
+          if(isNaN(answer)) {
+            return chalk.red('Please enter a 4 digit number');
+          }
+          else if(answer.toString().length !== 4) {
+            return chalk.red('PIN must be 4 digits');
+          }
+          else if (Number(answer) == account.pin) {
+            return chalk.red('New PIN cannot be the same as old PIN');
+          }
+          else {
+            return true;
+          }
+        }
+      },
+      {
+        type: 'confirm',
+        name: 'pinConfirm',
+        message: 'Are you sure you want to reset your PIN?',
+      }
+    ])
+    .then(answers => {
+      if(answers.pinConfirm) {
+        account.pin = answers.newPin;
+
+        console.log(`\n${chalk.cyan('Success!')} Your new PIN # is ${chalk.yellow(account.pin)}\n`);
+      }
+      else {
+        // mainMenu();
+      }
+      displayAccounts();
     })
 }
 
