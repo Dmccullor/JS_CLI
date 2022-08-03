@@ -9,6 +9,11 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import {Account, makeTransaction} from './src/model.js';
 
+// global variable declarations
+var idCounter = 1;
+var principal;
+var accountLedger = [];
+
 // HELPER FUNCTIONS
 const sleep = (ms = 2000) => new Promise ((r) => setTimeout(r, ms));
 
@@ -130,7 +135,7 @@ async function loginAccount() {
 }
 
 async function mainMenu() {
-  console.log(chalk.bgGreen('~~~~~MAIN MENU~~~~~\n'));
+  console.log(chalk.bgGreen('\n~~~~~MAIN MENU~~~~~\n'));
 
   await sleep();
   
@@ -140,7 +145,7 @@ async function mainMenu() {
         type: 'list',
         name: 'main',
         message: 'Please select an option below:',
-        choices: ['Deposit', 'Withdraw', 'Balance', 'Update PIN', 'Transaction History', 'Logout']
+        choices: ['Deposit', 'Withdraw', 'Balance', 'Update PIN', 'Transaction History', 'Display Info', 'Logout']
       }
     ])
     .then(answer => {
@@ -160,6 +165,9 @@ async function mainMenu() {
         case 'Transaction History':
           viewTransactions();
           break;
+        case 'Display Info':
+          showInfo();
+          break;
         case 'Logout':
           initMenu();
         default:
@@ -169,11 +177,6 @@ async function mainMenu() {
 }
 
 // MENU FUNCTIONS END
-
-// global variable declarations
-var idCounter = 1;
-var principal;
-var accountLedger = [];
 
 
 // LOGIN FUNCTIONS
@@ -256,7 +259,7 @@ async function createAccount() {
 async function makeDeposit() {
   let account = getAccountById(principal.id);
 
-  console.log(chalk.green('MAKE DEPOSIT\n'));
+  console.log(chalk.green('\nMAKE DEPOSIT\n'));
 
   await sleep();
 
@@ -291,7 +294,7 @@ async function makeDeposit() {
         account.balance = account.balance + amount;
         let transaction = makeTransaction('deposit', amount);
         account.transactions.push(transaction);
-        console.log(`\n${chalk.cyan('Deposit Success!')} Your new account balance is ${chalk.green('$' + account.balance)}\n`);
+        console.log(`\n${chalk.cyan('Deposit Success!')} Your new account balance is ${chalk.green('$' + (account.balance).toFixed(2))}\n`);
       }
       else {
         console.log(chalk.bgRed('Transaction cancelled. Returning to Main Menu.\n'));
@@ -303,7 +306,7 @@ async function makeDeposit() {
 async function makeWithdrawal() {
   let account = getAccountById(principal.id);
 
-  console.log(chalk.red('MAKE WITHDRAWAL\n'));
+  console.log(chalk.red('\nMAKE WITHDRAWAL\n'));
 
   await sleep();
 
@@ -341,7 +344,7 @@ async function makeWithdrawal() {
         account.balance = account.balance - amount;
         let transaction = makeTransaction('withdrawal', amount);
         account.transactions.push(transaction);
-        console.log(`\n${chalk.cyan('Withdrawal Success!')} Your new account balance is ${chalk.green('$' + account.balance)}\n`);
+        console.log(`\n${chalk.cyan('Withdrawal Success!')} Your new account balance is ${chalk.green('$' + (account.balance).toFixed(2))}\n`);
       }
       else {
         console.log(chalk.bgRed('Transaction cancelled. Returning to Main Menu\n'));
@@ -371,7 +374,7 @@ async function viewBalance() {
 
   console.log(chalk.cyan('\nAccount Balance:'));
   console.log(chalk.cyan('--------------------'));
-  console.log(chalk.green(`$${accountBalance}\n`));
+  console.log(chalk.green(`$${accountBalance.toFixed(2)}\n`));
 
   await sleep();
   await sleep();
@@ -382,7 +385,7 @@ async function viewBalance() {
 async function updatePin() {
   let account = getAccountById(principal.id);
 
-  console.log(chalk.yellow('Update PIN\n'));
+  console.log(chalk.yellow('\nUpdate PIN\n'));
 
   await sleep();
   
@@ -427,7 +430,17 @@ async function updatePin() {
     })
 }
 
+async function showInfo() {
+  console.log(`\nName: ${chalk.cyan(principal.name)}`);
+  console.log(`ID: ${chalk.yellow(principal.id)}`);
+  console.log(`Balance: ${chalk.green(principal.balance)}\n`);
+  await sleep();
+  await sleep();
+  mainMenu();
+}
+
 // MAIN MENU FUNCTIONS END
 
+// INITIALIZATION
 await welcome();
 await initMenu();
