@@ -9,8 +9,6 @@ export async function makeDeposit() {
   
     console.log(chalk.green('\nMAKE DEPOSIT\n'));
   
-    await sleep();
-  
     inquirer
       .prompt([
         {
@@ -55,8 +53,6 @@ export async function makeWithdrawal() {
     let account = getAccountById(principal.id);
   
     console.log(chalk.red('\nMAKE WITHDRAWAL\n'));
-  
-    await sleep();
   
     inquirer
       .prompt([
@@ -134,8 +130,6 @@ export async function updatePin() {
     let account = getAccountById(principal.id);
   
     console.log(chalk.yellow('\nUpdate PIN\n'));
-  
-    await sleep();
     
     inquirer
       .prompt([
