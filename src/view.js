@@ -111,6 +111,30 @@ export async function viewTransactions() {
     
     mainMenu();
   }
+
+export async function showInfo() {
+  console.log(`\nName: ${chalk.cyan(principal.name)}`);
+  console.log(`ID: ${chalk.yellow(principal.id)}`);
+  console.log(`Balance: ${chalk.green('$' + principal.balance)}`);
+  console.log('Recent Transactions:');
+  
+  let transactionList = principal.transactions.reverse();
+  let i = 0;
+
+  while(transactionList.length >= (i + 1)) {
+    if(i <= 4) {
+      console.log(transactionList[i]);
+      i++;
+    }
+    else {
+      i++;
+    }
+  }
+  
+  await sleep();
+  await sleep();
+  mainMenu();
+}
   
 export async function viewBalance() {
     let account = getAccountById(principal.id);
@@ -170,13 +194,4 @@ export async function updatePin() {
         }
         mainMenu();
       })
-  }
-  
-export async function showInfo() {
-    console.log(`\nName: ${chalk.cyan(principal.name)}`);
-    console.log(`ID: ${chalk.yellow(principal.id)}`);
-    console.log(`Balance: ${chalk.green('$' + principal.balance)}\n`);
-    await sleep();
-    await sleep();
-    mainMenu();
   }

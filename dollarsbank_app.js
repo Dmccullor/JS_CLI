@@ -49,7 +49,7 @@ async function initMenu() {
 }
 
 async function loginAccount() {
-  console.log(chalk.bgYellow('\nLogin to Account:\n'));
+  console.log(chalk.yellow('\nLogin to Account:\n'));
 
   inquirer
     .prompt([
@@ -114,7 +114,7 @@ async function loginAccount() {
 }
 
 export async function mainMenu() {
-  console.log(chalk.bgGreen('\n~~~~~MAIN MENU~~~~~\n'));
+  console.log(chalk.green('\n~~~~~MAIN MENU~~~~~\n'));
   
   inquirer
     .prompt([
@@ -158,7 +158,7 @@ export async function mainMenu() {
 
 // LOGIN FUNCTIONS
 async function createAccount() {
-  console.log(chalk.bgYellow('\nCreate New Account\n'));
+  console.log(chalk.yellow('\nCreate New Account\n'));
   
   inquirer
     .prompt([
